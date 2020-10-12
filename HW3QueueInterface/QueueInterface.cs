@@ -39,8 +39,5 @@ namespace HW3QueueInterface
     }
 
 
-    /*class MyQueue : QueueInterface<int>
-    {
-
-    }*/
+   
 }
