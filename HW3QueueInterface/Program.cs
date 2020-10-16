@@ -20,10 +20,11 @@ namespace HW3QueueInterface
 		}
 		static void Main(string[] args)
         {
+			
 			int C = 72;                     // Column length to wrap to
-			String inputFilename;
-			String outputFilename = "output.txt";
-			StreamWriter sw= null;
+			string inputFilename;
+			string outputFilename = "output.txt";
+			//StreamWriter sw= null;
 			StreamReader sr = null;
 
 			if (args.Length != 3)
@@ -34,6 +35,7 @@ namespace HW3QueueInterface
 
 			try
 			{
+				
 				C = Int32.Parse(args[0]);
 				inputFilename = args[1];
 				outputFilename = args[2];
@@ -41,6 +43,7 @@ namespace HW3QueueInterface
 			}
 			catch (FileNotFoundException e)
 			{
+				
 				Console.WriteLine("Could not find the input file.");
 				Environment.Exit(1);
 			}
@@ -50,8 +53,13 @@ namespace HW3QueueInterface
 				printUsage();
 				Environment.Exit(1);
 			}
+            /*finally
+            {
+				Console.WriteLine("Have a good day!");
+				Environment.Exit(1);
+            }*/
 
-			QueueInterface<string> words = new LinkedQueue<string>();
+			IQueueInterface<string> words = new LinkedQueue<string>();
 
 			// Read input file, tokenize by whitespace
 			string str = sr.ReadLine();
@@ -73,7 +81,7 @@ namespace HW3QueueInterface
 			/* ------------------ Start here ---------------------- */
 
 			// As an example, do a simple wrap
-			int spacesRemaining = wrapSimply(words, C, outputFilename);
+			int spacesRemaining = WrapSimply(words, C, outputFilename);
 			Console.WriteLine("Total spaces remaining (Greedy): " + spacesRemaining);
 			Console.Read();
 
@@ -81,7 +89,7 @@ namespace HW3QueueInterface
 
 
 
-		public static int wrapSimply(QueueInterface<String> words, int columnLength, String outputFilename)
+		public static int WrapSimply(IQueueInterface<String> words, int columnLength, String outputFilename)
 		{
             StreamWriter _out; 
 
@@ -97,38 +105,52 @@ namespace HW3QueueInterface
 			}
 
 			int col = 1;
-			int spacesRemaining = 0;            // Running count of spaces left at the end of lines
-			while (!words.isEmpty())
-			{
-				String str = words.peek();
-				int len = str.Length;
-				// See if we need to wrap to the next line
-				if (col == 1)
-				{
-				_out.Write(str);
-					col += len;
-					words.dequeue();
-				}
-				else if ((col + len) >= columnLength)
-				{
-				// go to the next line
-				_out.WriteLine();
-					spacesRemaining += (columnLength - col) + 1;
-					col = 1;
-				}
-				else
-				{	// Typical case of printing the next word on the same line
-				_out.Write(" ");
-				_out.Write(str);
-					col += (len + 1);
-					words.dequeue();
-				}
+			int spacesRemaining = 0;
+            // Running count of spaces left at the end of lines
 
+            try
+            {
+				while (!words.isEmpty())
+				{
+					String str = words.peek();
+					int len = str.Length;
+					// See if we need to wrap to the next line
+					if (col == 1)
+					{
+						_out.Write(str);
+						col += len;
+						words.dequeue();
+					}
+					else if ((col + len) >= columnLength)
+					{
+						// go to the next line
+						_out.WriteLine();
+						spacesRemaining += (columnLength - col) + 1;
+						col = 1;
+					}
+					else
+					{   // Typical case of printing the next word on the same line
+						_out.Write(" ");
+						_out.Write(str);
+						col += (len + 1);
+						words.dequeue();
+					}
+
+				}
 			}
-			_out.WriteLine();
-			_out.Flush();
-			_out.Close();
+			catch(QueueUnderflowException e)
+            {
+				Console.WriteLine("Exception occured : The queue was empty");
+            }
+            finally
+            {
+				_out.WriteLine();
+				_out.Flush();
+				_out.Close();
+				
+			}
 			return spacesRemaining;
+
 		}
 	}
 }

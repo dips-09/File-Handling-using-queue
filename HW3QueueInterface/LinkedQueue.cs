@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HW3QueueInterface
 {
-    class LinkedQueue<T> : QueueInterface<T>
+    class LinkedQueue<T> : IQueueInterface<T>
     {
         private Node<T> front;
         private Node<T> rear;
